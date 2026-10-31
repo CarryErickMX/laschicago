@@ -29,4 +29,4 @@ Cada `git push` a `main` publica el sitio en GitHub Pages: https://carryerickmx.
 
 ### Horarios
 
-Cada sucursal tiene `horario: null`, y el sitio pide confirmarlo por WhatsApp. Cuando el negocio dé sus horarios, llena el campo como indica el comentario en `negocio.js`. El sitio mostrará "Abierto ahora" o "Cerrado ahora" según la hora del centro de México.
+Están en el campo `horario` de cada sucursal, en `src/data/negocio.js`. El sitio arma la tabla y muestra "Abierto ahora" o "Cerrado ahora" según la hora del centro de México.

@@ -1,7 +1,7 @@
 // Partes que cambian según la fecha, además de las pestañas del menú y el mapa.
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { semana, evento, sucursales } from '../data/negocio.js';
+import { semana, evento, sucursales, hora12 } from '../data/negocio.js';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -87,15 +87,28 @@ const seccionEvento = q('[data-evento]');
 if (hoy.fecha > evento.hasta) seccionEvento.remove();
 
 // Horarios: si hay datos en negocio.js, muestra abierto o cerrado.
+const NOMBRES_DIA = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
+
+function proximaApertura(horario) {
+  const rangoHoy = horario[hoy.dia];
+  if (rangoHoy && hoy.hora < rangoHoy[0]) return `Abre hoy a las ${hora12(rangoHoy[0])}`;
+  for (let i = 1; i <= 7; i++) {
+    const dia = (hoy.dia + i) % 7;
+    if (horario[dia]) return `Abre ${i === 1 ? 'mañana' : `el ${NOMBRES_DIA[dia]}`} a las ${hora12(horario[dia][0])}`;
+  }
+  return '';
+}
+
 sucursales.forEach((s) => {
-  if (!s.horario) return;
-  const salida = q(`[data-sede="${s.id}"] [data-horario-texto]`);
+  const sede = q(`[data-sede="${s.id}"]`);
+  const salida = q('[data-horario-texto]', sede);
   const rango = s.horario[hoy.dia];
-  const abierto = rango && hoy.hora >= rango[0] && hoy.hora < rango[1];
-  salida.textContent = rango
-    ? `${abierto ? 'Abierto ahora' : 'Cerrado ahora'}. Hoy de ${rango[0]} a ${rango[1]}.`
-    : 'Hoy cerrado.';
-  salida.classList.toggle('es-abierto', Boolean(abierto));
+  const abierto = Boolean(rango) && hoy.hora >= rango[0] && hoy.hora < rango[1];
+  salida.textContent = abierto ? `Abierto ahora, hasta las ${hora12(rango[1])}` : `Cerrado ahora. ${proximaApertura(s.horario)}`;
+  salida.classList.toggle('es-abierto', abierto);
+  qq('[data-dias]', sede).forEach((fila) => {
+    fila.classList.toggle('es-hoy', fila.dataset.dias.split(',').map(Number).includes(hoy.dia));
+  });
 });
 
 // Mapa bajo demanda: no carga nada de Google hasta que el visitante lo pide.

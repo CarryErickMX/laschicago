@@ -8,18 +8,19 @@ export const negocio = {
   seguidores: '2.4 mil',
 };
 
-// horario: null muestra "Confirma por WhatsApp".
-// Para activar abierto/cerrado usa, por ejemplo:
-// horario: { 0: ['13:00', '22:00'], 1: null, 2: ['13:00', '22:00'], ... } (0 = domingo, null = cerrado)
+// Horario por día: 0 = domingo ... 6 = sábado; null = cerrado. Formato de 24 horas.
+const normal = ['15:00', '22:30'];
+const largo = ['15:00', '23:59'];
+
 export const sucursales = [
   {
     id: 'santa-cruz',
     nombre: 'Santa Cruz de Abajo',
-    direccion: 'Calle Miguel Hidalgo 775, Santa Cruz de Abajo, Texcoco, Méx.',
+    direccion: 'Calle Miguel Hidalgo 775, Santa Cruz de Abajo, Texcoco, Méx., 56205',
     whatsapp: '525510957150',
     telefono: '55 1095 7150',
-    mapa: 'Calle Miguel Hidalgo 775, Santa Cruz de Abajo, Texcoco, México',
-    horario: null,
+    mapa: 'Calle Miguel Hidalgo 775, 56205 Santa Cruz de Abajo, Texcoco, México',
+    horario: { 0: normal, 1: null, 2: normal, 3: normal, 4: normal, 5: largo, 6: largo },
   },
   {
     id: 'chiconcuac',
@@ -28,9 +29,33 @@ export const sucursales = [
     whatsapp: '525571167121',
     telefono: '55 7116 7121',
     mapa: 'Prol. Hidalgo Sur 17, Chiconcuac de Juárez, 56210, México',
-    horario: null,
+    horario: { 0: normal, 1: null, 2: normal, 3: normal, 4: normal, 5: normal, 6: normal },
   },
 ];
+
+// '15:00' -> '3:00 p. m.'
+export function hora12(hora) {
+  const [h, m] = hora.split(':').map(Number);
+  return `${h % 12 || 12}:${String(m).padStart(2, '0')} ${h < 12 ? 'a. m.' : 'p. m.'}`;
+}
+
+// Junta los días seguidos con el mismo horario, de lunes a domingo.
+const DIAS = [[1, 'Lunes'], [2, 'Martes'], [3, 'Miércoles'], [4, 'Jueves'], [5, 'Viernes'], [6, 'Sábado'], [0, 'Domingo']];
+
+export function horarioAgrupado(horario) {
+  const grupos = [];
+  for (const [dia, nombre] of DIAS) {
+    const texto = horario[dia] ? `${hora12(horario[dia][0])} a ${hora12(horario[dia][1])}` : 'Cerrado';
+    const ultimo = grupos.at(-1);
+    if (ultimo?.texto === texto) {
+      ultimo.hasta = nombre;
+      ultimo.dias.push(dia);
+    } else {
+      grupos.push({ desde: nombre, hasta: nombre, texto, dias: [dia] });
+    }
+  }
+  return grupos.map((g) => ({ ...g, etiqueta: g.desde === g.hasta ? g.desde : `${g.desde} ${g.dias.length === 2 ? "y" : "a"} ${g.hasta.toLowerCase()}` }));
+}
 
 // Semana de promociones: el índice es el día (0 = domingo).
 export const semana = [

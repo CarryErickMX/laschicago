@@ -2187,3 +2187,47 @@ button {
     width: min(82%, 380px);
   }
 }
+
+/* Horario de cada sucursal */
+.sede__estado {
+  margin-top: 14px;
+  font-family: var(--titulo);
+  font-weight: 800;
+  font-size: 1.5rem;
+  line-height: 1.1;
+  text-transform: uppercase;
+  color: var(--rojo-hondo);
+}
+
+.sede__estado:empty {
+  display: none;
+}
+
+.sede__estado.es-abierto {
+  color: var(--tinta);
+}
+
+.sede__horas {
+  max-width: 460px;
+  margin-top: 8px;
+}
+
+.sede__horas li {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 5px 8px;
+  border-bottom: 1px solid rgb(71 55 31 / 0.4);
+  font-size: 0.98rem;
+}
+
+.sede__horas b {
+  font-weight: 600;
+  text-align: right;
+}
+
+.sede__horas li.es-hoy {
+  background: var(--tinta);
+  color: var(--hueso);
+  border-bottom-color: transparent;
+}

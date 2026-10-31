@@ -9,7 +9,7 @@ import Menu from '../components/Menu.astro';
 import Alineacion from '../components/Alineacion.astro';
 import Foto from '../components/Foto.astro';
 import Icono from '../components/Icono.astro';
-import { negocio, sucursales, semana, evento } from '../data/negocio.js';
+import { negocio, sucursales, semana, evento, horarioAgrupado } from '../data/negocio.js';
 import { buscarItem } from '../data/menu.js';
 import Cancha from '../components/Cancha.astro';
 
@@ -25,6 +25,8 @@ const base = import.meta.env.BASE_URL;
 const titulo = 'Las Chicago | Alitas y costillas en Texcoco y Chiconcuac';
 const descripcion = 'Alitas, costillas, burgers y preparados en Santa Cruz de Abajo y Chiconcuac. Consulta el menú y las promos, y arma tu pedido por WhatsApp.';
 
+const DIAS_SCHEMA = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
 const jsonLd = {
   '@context': 'https://schema.org',
   '@graph': sucursales.map((s) => ({
@@ -32,6 +34,9 @@ const jsonLd = {
     name: `${negocio.completo} (${s.nombre})`,
     servesCuisine: ['Alitas', 'Costillas', 'Hamburguesas'],
     telephone: `+${s.whatsapp}`,
+    openingHoursSpecification: Object.entries(s.horario)
+      .filter(([, rango]) => rango)
+      .map(([dia, rango]) => ({ '@type': 'OpeningHoursSpecification', dayOfWeek: DIAS_SCHEMA[dia], opens: rango[0], closes: rango[1] })),
     address: { '@type': 'PostalAddress', streetAddress: s.direccion, addressRegion: 'Estado de México', addressCountry: 'MX' },
     sameAs: [negocio.facebook, negocio.tiktok],
   })),
@@ -196,10 +201,15 @@ const jsonLd = {
           <h2 class="titulo" id="sucursales-titulo" data-titulo>Dos canchas, un sabor</h2>
           <div class="sedes">
             {sucursales.map((s) => (
-              <article class="sede" data-sede={s.id} data-horario={JSON.stringify(s.horario)}>
+              <article class="sede" data-sede={s.id}>
                 <h3 class="sede__nombre">{s.nombre}</h3>
                 <p class="sede__dir"><Icono nombre="mapPin" /> {s.direccion}</p>
-                <p class="sede__horario" data-horario-texto>Horario: confírmalo por WhatsApp.</p>
+                <p class="sede__estado" data-horario-texto></p>
+                <ul class="sede__horas">
+                  {horarioAgrupado(s.horario).map((g) => (
+                    <li data-dias={g.dias.join(',')}><span>{g.etiqueta}</span> <b>{g.texto}</b></li>
+                  ))}
+                </ul>
                 <div class="sede__acciones">
                   <button type="button" class="boton boton--tinta" data-pedir-en={s.id}>Pedir aquí <Icono nombre="arrow" /></button>
                   <a class="sede__enlace" href={`https://wa.me/${s.whatsapp}`} target="_blank" rel="noopener"><Icono nombre="whatsapp" /> {s.telefono}</a>
