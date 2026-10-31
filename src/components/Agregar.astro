@@ -1,0 +1,22 @@
+---
+import Icono from './Icono.astro';
+
+// Botón que suma un platillo a la alineación. Los datos viajan en atributos para pedido.js.
+const { item, tamano, compacto = false, texto, sabores = null } = Astro.props;
+const detalle = tamano.label ?? '';
+const etiqueta = `Agregar ${item.nombre}${detalle ? `, ${detalle}` : ''}, $${tamano.precio}`;
+---
+<button
+  type="button"
+  class:list={['agregar', { 'agregar--compacto': compacto }]}
+  data-agregar
+  data-id={item.id}
+  data-nombre={item.nombre}
+  data-detalle={detalle}
+  data-precio={tamano.precio}
+  data-sabores={sabores}
+  aria-label={etiqueta}
+>
+  <Icono nombre="plus" />
+  {texto && <span>{texto}</span>}
+</button>

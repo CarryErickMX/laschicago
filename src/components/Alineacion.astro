@@ -1,0 +1,59 @@
+---
+import Icono from './Icono.astro';
+import { sucursales } from '../data/negocio.js';
+---
+<button type="button" class="dock" data-dock data-abrir-pedido hidden>
+  <span class="dock__cuenta" data-cuenta>0</span>
+  <span class="dock__texto">Tu alineación</span>
+  <span class="dock__total" data-total>$0</span>
+  <Icono nombre="arrow" />
+</button>
+
+<dialog class="pedido" data-pedido aria-labelledby="pedido-titulo">
+  <div class="pedido__cabeza">
+    <h2 id="pedido-titulo">Tu alineación</h2>
+    <button type="button" class="pedido__cerrar" data-cerrar-pedido aria-label="Cerrar pedido"><Icono nombre="x" /></button>
+  </div>
+
+  <div class="pedido__cuerpo">
+    <p class="pedido__vacio" data-vacio>Todavía no tienes cromos. Agrega alitas, costillas o lo que se te antoje.</p>
+    <ul class="lineas" data-lineas></ul>
+
+    <div data-con-items hidden>
+      <fieldset class="elige">
+        <legend>¿A qué sucursal lo mandas?</legend>
+        {sucursales.map((s) => (
+          <label class="elige__op">
+            <input type="radio" name="sucursal" value={s.id} data-sucursal />
+            <span><b>{s.nombre}</b><small>WhatsApp {s.telefono}</small></span>
+          </label>
+        ))}
+      </fieldset>
+
+      <div class="vista">
+        <p class="vista__titulo">Así se va a enviar</p>
+        <p class="vista__mensaje" data-mensaje aria-live="off"></p>
+      </div>
+
+      <label class="campo">
+        <span>Tu nombre</span>
+        <input type="text" data-cliente autocomplete="given-name" maxlength="60" />
+      </label>
+      <label class="campo">
+        <span>Notas <small>(salsa, recoger a las 8, etc.)</small></span>
+        <textarea data-notas rows="2" maxlength="240"></textarea>
+      </label>
+    </div>
+  </div>
+
+  <div class="pedido__pie" data-pie hidden>
+    <p class="pedido__total"><span>Total estimado</span> <b data-total>$0</b></p>
+    <p class="pedido__ayuda" data-ayuda>Elige sucursal para enviar.</p>
+    <a class="enviar" data-enviar target="_blank" rel="noopener" aria-disabled="true">
+      <Icono nombre="whatsapp" /> Enviar por WhatsApp
+    </a>
+    <button type="button" class="vaciar" data-vaciar>Vaciar alineación</button>
+  </div>
+</dialog>
+
+<p class="sr-only" aria-live="polite" data-anuncio></p>

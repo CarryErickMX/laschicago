@@ -1,0 +1,79 @@
+---
+import Cromo from './Cromo.astro';
+import Agregar from './Agregar.astro';
+import { categorias } from '../data/menu.js';
+
+---
+<section class="menu" id="menu" aria-labelledby="menu-titulo">
+  <div class="envoltura">
+    <h2 class="titulo" id="menu-titulo" data-titulo>Junta tu alineación</h2>
+    <p class="menu__intro">Elige categoría, voltea el cromo para ver precios y súmalo a tu pedido.</p>
+
+    <div class="pestanas" role="tablist" aria-label="Categorías del menú" data-pestanas hidden>
+      {categorias.map((c, i) => (
+        <button
+          type="button"
+          role="tab"
+          class="pestana"
+          id={`tab-${c.id}`}
+          aria-controls={`panel-${c.id}`}
+          aria-selected={i === 0 ? 'true' : 'false'}
+          tabindex={i === 0 ? 0 : -1}
+        >
+          {c.titulo}
+        </button>
+      ))}
+    </div>
+
+    {categorias.map((c, i) => {
+      const cromos = c.items.filter((it) => it.cromo);
+      const filas = c.items.filter((it) => !it.cromo);
+      return (
+        <div class:list={['panel', { 'es-activo': i === 0, 'panel--junto': cromos.length > 0 && filas.length > 0 && filas.length <= 6 }]} id={`panel-${c.id}`} data-panel role="tabpanel" aria-labelledby={`tab-${c.id}`} tabindex="-1">
+          <h3 class="panel__titulo">{c.titulo}</h3>
+          {cromos.length > 0 && (
+            <div class="baraja" data-baraja style={`--cantidad:${cromos.length}`}>
+              {cromos.map((it) => <Cromo item={it} color={c.color} />)}
+            </div>
+          )}
+          {filas.length > 0 && (
+            <div class="carton">
+              <ul class="tabla">
+                {filas.map((it) => {
+                  const idSabor = it.sabores ? `sabor-${it.id}` : null;
+                  return (
+                    <li class="fila" data-fila>
+                      <div class="fila__texto">
+                        <h4 class="fila__nombre">{it.nombre}</h4>
+                        {it.desc && <p class="fila__desc">{it.desc}</p>}
+                        {it.sabores && (
+                          <label class="sabor">
+                            <span>Sabor</span>
+                            <select id={idSabor}>
+                              {it.sabores.map((s) => <option>{s}</option>)}
+                            </select>
+                          </label>
+                        )}
+                      </div>
+                      <ul class="fila__precios">
+                        {it.tamanos.map((t) => (
+                          <li>
+                            {t.label && <span>{t.label}</span>}
+                            <b>${t.precio}</b>
+                            <Agregar item={it} tamano={t} compacto sabores={idSabor} />
+                          </li>
+                        ))}
+                      </ul>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          )}
+          {c.nota && <p class="panel__nota">{c.nota}</p>}
+        </div>
+      );
+    })}
+    <p class="menu__aviso">Precios en pesos mexicanos, sujetos a cambio. Las fotos son ilustrativas.</p>
+  </div>
+</section>

@@ -1,0 +1,247 @@
+---
+import '@fontsource-variable/big-shoulders-display';
+import '@fontsource-variable/archivo/standard';
+import '@fontsource/mr-dafoe/400.css';
+import '../styles/sitio.css';
+
+import Cromo from '../components/Cromo.astro';
+import Menu from '../components/Menu.astro';
+import Alineacion from '../components/Alineacion.astro';
+import Foto from '../components/Foto.astro';
+import Icono from '../components/Icono.astro';
+import { negocio, sucursales, semana, evento } from '../data/negocio.js';
+import { buscarItem } from '../data/menu.js';
+import Cancha from '../components/Cancha.astro';
+
+const mano = [
+  { id: 'papas-gajo', color: 'mostaza' },
+  { id: 'burger-pippen', color: 'azul' },
+  { id: 'alitas', color: 'tinta', principal: true },
+  { id: 'burger-chicago', color: 'mostaza' },
+  { id: 'hotdog-chicago', color: 'azul' },
+];
+
+const base = import.meta.env.BASE_URL;
+const titulo = 'Las Chicago | Alitas y costillas en Texcoco y Chiconcuac';
+const descripcion = 'Alitas, costillas, burgers y preparados en Santa Cruz de Abajo y Chiconcuac. Consulta el menú y las promos, y arma tu pedido por WhatsApp.';
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': sucursales.map((s) => ({
+    '@type': 'Restaurant',
+    name: `${negocio.completo} (${s.nombre})`,
+    servesCuisine: ['Alitas', 'Costillas', 'Hamburguesas'],
+    telephone: `+${s.whatsapp}`,
+    address: { '@type': 'PostalAddress', streetAddress: s.direccion, addressRegion: 'Estado de México', addressCountry: 'MX' },
+    sameAs: [negocio.facebook, negocio.tiktok],
+  })),
+};
+---
+<!doctype html>
+<html lang="es-MX">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>{titulo}</title>
+    <meta name="description" content={descripcion} />
+    <meta name="theme-color" content="#15131A" />
+    <meta property="og:title" content={titulo} />
+    <meta property="og:description" content={descripcion} />
+    <meta property="og:type" content="restaurant" />
+    <meta property="og:locale" content="es_MX" />
+    <meta property="og:image" content={new URL(`${base}img/mesa-960.webp`, Astro.site)} />
+    <meta name="robots" content="noindex" />
+    <link rel="icon" href={`${base}img/logo-180.webp`} />
+    <script is:inline>document.documentElement.classList.add('js');</script>
+    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+  </head>
+  <body>
+    <a class="saltar" href="#menu">Saltar al menú</a>
+
+    <header class="barra">
+      <a class="barra__logo" href="#inicio" aria-label="Las Chicago, inicio">
+        <img src={`${base}img/logo-180.webp`} alt="" width="180" height="167" />
+        <span class="barra__marca">Las Chicago</span>
+      </a>
+      <nav class="barra__nav" aria-label="Principal">
+        <a href="#promos">Promos</a>
+        <a href="#menu">Menú</a>
+        <a href="#pippen" class="solo-ancho">Pippen</a>
+        <a href="#sucursales">Sucursales</a>
+      </nav>
+      <button type="button" class="barra__pedido" data-abrir-pedido>
+        Alineación <span class="barra__cuenta" data-cuenta>0</span>
+      </button>
+    </header>
+
+    <main>
+      <section class="inicio" id="inicio" data-inicio>
+        <Cancha clase="inicio__cancha" />
+        <h1 class="inicio__titulo" data-inicio-titulo>
+          <span class="linea">Alitas y</span> <span class="linea">costillas</span>
+        </h1>
+        <div class="mano" data-mano>
+          {mano.map((m, i) => (
+            <div class="mano__carta" data-carta style={`--i:${i - 2}`}>
+              <Cromo item={buscarItem(m.id)} color={m.color} nivel="p" principal={m.principal} loading={m.principal ? 'eager' : 'lazy'} sizes="(max-width: 760px) 60vw, 340px" />
+            </div>
+          ))}
+        </div>
+        <div class="inicio__repisa">
+          <div class="inicio__texto">
+            <p><span class="inicio__firma">Las Chicago</span> Santa Cruz de Abajo y Chiconcuac. Arma tu alineación y mándala por WhatsApp.</p>
+            <a class="boton" href="#menu">Ver el menú <Icono nombre="arrow" /></a>
+          </div>
+          <p class="inicio__hoy" data-hoy-resumen><a href="#promos">Promos de la semana</a></p>
+        </div>
+      </section>
+
+      <section class="promos" id="promos" aria-labelledby="promos-titulo">
+        <div class="envoltura">
+          <h2 class="titulo" id="promos-titulo" data-titulo>La jugada de la semana</h2>
+          <p class="promos__hoy" data-hoy-linea></p>
+          <div class="semana" data-semana>
+            {semana.map((d) => (
+              <article class:list={['dia', { 'dia--promo': d.promo }]} data-dia={d.dia} data-tiene-promo={d.promo ? '1' : '0'}>
+                <button type="button" class="dia__boton" aria-expanded="false" aria-label={d.nombre}>
+                  <span class="dia__letra" aria-hidden="true">{d.letra}</span>
+                  {d.promo && <span class="dia__corta" aria-hidden="true">{d.promo.grande}</span>}
+                </button>
+                <div class="dia__info">
+                  <h3 class="dia__nombre">{d.nombre}</h3>
+                  {d.promo ? (
+                    <>
+                      <p class="dia__grande" aria-hidden="true">{d.promo.grande}</p>
+                      <p class="dia__titulo">{d.promo.titulo}</p>
+                      <p class="dia__detalle">{d.promo.detalle}</p>
+                    </>
+                  ) : (
+                    <p class="dia__detalle" data-sin-promo>Menú completo a precio de siempre.</p>
+                  )}
+                </div>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section class="evento" data-evento data-hasta={evento.hasta} aria-labelledby="evento-titulo">
+        <div class="envoltura evento__rejilla">
+          <div>
+            <h2 class="titulo" id="evento-titulo" data-titulo>{evento.titulo}</h2>
+            <p class="evento__notas">{evento.notas}</p>
+          </div>
+          <ul class="premios">
+            {evento.premios.map((p) => (
+              <li><span>{p.lugar}</span> <b data-contar={p.monto}>${p.monto.toLocaleString('es-MX')}</b></li>
+            ))}
+          </ul>
+          <ul class="evento__fechas">
+            {evento.fechas.map((f) => {
+              const s = sucursales.find((x) => x.id === f.sucursal);
+              const texto = encodeURIComponent(`Hola, quiero información del concurso de disfraces en ${f.lugar}.`);
+              return (
+                <li>
+                  <p><b>{f.cuando}</b><br />{f.lugar}</p>
+                  <a class="enlace-wa" href={`https://wa.me/${s.whatsapp}?text=${texto}`} target="_blank" rel="noopener">
+                    <Icono nombre="whatsapp" /> Preguntar por lugares
+                  </a>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      </section>
+
+      <Menu />
+
+      <section class="pippen" id="pippen" aria-labelledby="pippen-titulo" data-pippen>
+        <div class="envoltura pippen__rejilla">
+          <figure class="pippen__figura" data-pippen-figura>
+            <img
+              src={`${base}img/pippen-980.webp`}
+              srcset={`${base}img/pippen-560.webp 560w, ${base}img/pippen-980.webp 980w`}
+              sizes="(max-width: 760px) 80vw, 480px"
+              width="980"
+              height="1575"
+              loading="lazy"
+              decoding="async"
+              alt="Pippen, el toro mascota de Las Chicago, sonriendo con un tazón de papas gajo en la mano"
+            />
+            <figcaption class="pippen__firma">Pippen</figcaption>
+          </figure>
+          <div class="pippen__texto">
+            <h2 class="titulo" id="pippen-titulo" data-titulo>Él es Pippen</h2>
+            <p class="pippen__lema">Nueva imagen, mismo sabor</p>
+            <p>Tu lugar favorito estrena imagen, conservando el sabor que nos hace únicos. El nuevo fichaje se llama Pippen y ya tiene su propia hamburguesa.</p>
+            <dl class="ficha">
+              <div><dt>Posición</dt><dd>Mascota</dd></div>
+              <div><dt>Especialidad</dt><dd>Alitas y costillas</dd></div>
+              <div><dt>Sucursales</dt><dd>{sucursales.length}</dd></div>
+              <div><dt>Afición en Facebook</dt><dd>{negocio.seguidores}</dd></div>
+            </dl>
+          </div>
+        </div>
+      </section>
+
+      <figure class="mesa" data-mesa>
+        <div class="mesa__marco" data-mesa-marco>
+          <Foto img="mesa" alt="Mesa con alitas, papas gajo, banderilla, hot dog y bebidas preparadas" sizes="100vw" />
+        </div>
+      </figure>
+
+      <section class="sucursales" id="sucursales" aria-labelledby="sucursales-titulo">
+        <Cancha clase="sucursales__cancha" />
+        <div class="envoltura">
+          <h2 class="titulo" id="sucursales-titulo" data-titulo>Dos canchas, un sabor</h2>
+          <div class="sedes">
+            {sucursales.map((s) => (
+              <article class="sede" data-sede={s.id} data-horario={JSON.stringify(s.horario)}>
+                <h3 class="sede__nombre">{s.nombre}</h3>
+                <p class="sede__dir"><Icono nombre="mapPin" /> {s.direccion}</p>
+                <p class="sede__horario" data-horario-texto>Horario: confírmalo por WhatsApp.</p>
+                <div class="sede__acciones">
+                  <button type="button" class="boton boton--tinta" data-pedir-en={s.id}>Pedir aquí <Icono nombre="arrow" /></button>
+                  <a class="sede__enlace" href={`https://wa.me/${s.whatsapp}`} target="_blank" rel="noopener"><Icono nombre="whatsapp" /> {s.telefono}</a>
+                  <a class="sede__enlace" href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(s.mapa)}`} target="_blank" rel="noopener"><Icono nombre="mapPin" /> Cómo llegar</a>
+                </div>
+                <button type="button" class="ver-mapa" data-ver-mapa={s.mapa} aria-expanded="false">Ver mapa aquí</button>
+                <div class="sede__mapa" data-mapa hidden></div>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="pie">
+      <div class="envoltura">
+        <p class="pie__frase" data-pie-frase>¿Ya se te antojó?</p>
+        <a class="boton boton--mostaza" href="#menu">Armar mi pedido <Icono nombre="arrow" /></a>
+      </div>
+      <div class="pie__base">
+        <div class="envoltura pie__fila">
+          <img src={`${base}img/logo-180.webp`} alt="Las Chicago, Alitas y Costillas" width="150" height="139" loading="lazy" />
+          <ul class="pie__sedes">
+            {sucursales.map((s) => (
+              <li><b>{s.nombre}</b><a href={`https://wa.me/${s.whatsapp}`} target="_blank" rel="noopener"><Icono nombre="whatsapp" /> {s.telefono}</a></li>
+            ))}
+          </ul>
+          <ul class="pie__redes">
+            <li><a href={negocio.facebook} target="_blank" rel="noopener"><Icono nombre="facebook" /> Facebook</a></li>
+            <li><a href={negocio.tiktok} target="_blank" rel="noopener"><Icono nombre="tiktok" /> TikTok</a></li>
+          </ul>
+        </div>
+      </div>
+    </footer>
+
+    <Alineacion />
+
+    <script>
+      import '../scripts/pedido.js';
+      import '../scripts/cromos.js';
+      import '../scripts/interfaz.js';
+      import '../scripts/movimiento.js';
+    </script>
+  </body>
+</html>

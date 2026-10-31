@@ -1,0 +1,59 @@
+---
+import Foto from './Foto.astro';
+import Agregar from './Agregar.astro';
+import Icono from './Icono.astro';
+import { numeroCromo, posicionCromo } from '../data/menu.js';
+
+const { item, color = 'rojo', nivel: Nivel = 'h3', loading = 'lazy', sizes, principal = false } = Astro.props;
+const primero = item.tamanos[0];
+const varios = item.tamanos.length > 1;
+const desde = Math.min(...item.tamanos.map((t) => t.precio));
+const numeroTexto = String(numeroCromo(item.id)).padStart(2, '0');
+const posicion = posicionCromo(item.id);
+---
+<article class:list={['cromo', `c-${color}`, { 'cromo--principal': principal }]} data-cromo>
+  <div class="cromo__tilt">
+    <div class="cromo__rig">
+      <div class="cromo__inner">
+        <div class="cromo__cara cromo__frente" data-frente>
+          <div class="cromo__foto">
+            <Foto img={item.cromo.img} alt={item.cromo.alt} pos={item.cromo.pos} loading={loading} sizes={sizes} />
+            <span class="cromo__foil" aria-hidden="true"></span>
+            <span class="cromo__numero" aria-hidden="true">N.º {numeroTexto} · {posicion}</span>
+            <span class="cromo__firma" aria-hidden="true">Las Chicago</span>
+          </div>
+          <div class="cromo__placa">
+            <Nivel class="cromo__nombre">{item.nombre}</Nivel>
+            <p class="cromo__precio">{varios && <small>desde</small>} ${desde}</p>
+          </div>
+          <div class="cromo__acciones">
+            <Agregar item={item} tamano={primero} texto={item.boton ?? `Agregar ${varios ? (primero.label.match(/\d.*/)?.[0] ?? primero.label) : ''}`.trim()} />
+            <button type="button" class="voltear" data-voltear aria-label={`Ver precios de ${item.nombre}`}>
+              <Icono nombre="repeat" /> <span>Precios</span>
+            </button>
+          </div>
+        </div>
+        <div class="cromo__cara cromo__reverso" data-reverso inert>
+          <p class="reverso__serie" aria-hidden="true"><span>N.º {numeroTexto}</span> <span>{posicion}</span></p>
+          <p class="reverso__titulo">{item.nombre}</p>
+          {item.desc && <p class="reverso__desc">{item.desc}</p>}
+          <ul class="reverso__tabla">
+            {item.tamanos.map((t) => (
+              <li>
+                <span>{t.label || 'Orden'}</span>
+                <b>${t.precio}</b>
+                <Agregar item={item} tamano={t} compacto />
+              </li>
+            ))}
+          </ul>
+          <div class="reverso__pie">
+            <button type="button" class="voltear voltear--reverso" data-voltear aria-label={`Volver a la foto de ${item.nombre}`}>
+              <Icono nombre="repeat" /> <span>Voltear</span>
+            </button>
+            <span class="reverso__firma" aria-hidden="true">Las Chicago</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</article>

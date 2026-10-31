@@ -1,0 +1,17 @@
+---
+import plus from 'lucide-static/icons/plus.svg?raw';
+import minus from 'lucide-static/icons/minus.svg?raw';
+import x from 'lucide-static/icons/x.svg?raw';
+import mapPin from 'lucide-static/icons/map-pin.svg?raw';
+import phone from 'lucide-static/icons/phone.svg?raw';
+import repeat from 'lucide-static/icons/repeat-2.svg?raw';
+import arrow from 'lucide-static/icons/arrow-right.svg?raw';
+import whatsapp from 'simple-icons/icons/whatsapp.svg?raw';
+import facebook from 'simple-icons/icons/facebook.svg?raw';
+import tiktok from 'simple-icons/icons/tiktok.svg?raw';
+
+const iconos = { plus, minus, x, mapPin, phone, repeat, arrow, whatsapp, facebook, tiktok };
+const marcas = ['whatsapp', 'facebook', 'tiktok'];
+const { nombre } = Astro.props;
+---
+<span class:list={['ico', { 'ico--marca': marcas.includes(nombre) }]} aria-hidden="true" set:html={iconos[nombre]} />
