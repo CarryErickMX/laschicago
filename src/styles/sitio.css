@@ -353,17 +353,54 @@ button {
   top: calc(var(--t) * 1.1 + 20px);
   width: var(--ancho);
   margin-left: calc(var(--ancho) / -2);
-  transform: translateX(calc(var(--i) * var(--paso))) translateY(calc(var(--i) * var(--i) * 12px)) rotate(calc(var(--i) * 6deg));
-  transform-origin: 50% 90%;
+  --sube: 12px;
+  --gira: 6deg;
+  --alza: 0px;
+  z-index: 1;
 }
 
-.mano__carta:has(.cromo--principal) {
+/* La posición en el abanico va en un envoltorio propio: GSAP anima la carta y CSS la posición */
+.mano__pos {
+  position: relative;
+  transform: translateX(calc(var(--i) * var(--paso))) translateY(calc(var(--i) * var(--i) * var(--sube) + var(--alza))) rotate(calc(var(--i) * var(--gira)));
+  transform-origin: 50% 90%;
+  transition: transform 520ms var(--panel);
+}
+
+.mano__carta[data-pos='0'] {
   z-index: 3;
 }
 
-.mano__carta:nth-child(2),
-.mano__carta:nth-child(4) {
+.mano__carta[data-pos='-1'],
+.mano__carta[data-pos='1'] {
   z-index: 2;
+}
+
+.mano__elegir {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: none;
+  border-radius: 12px;
+  cursor: pointer;
+}
+
+.mano__carta:not([data-pos='0']) .mano__elegir {
+  display: block;
+}
+
+.mano__carta:not([data-pos='0']) .cromo__acciones {
+  opacity: 0.55;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .mano__carta:not([data-pos='0']):hover {
+    --alza: -18px;
+  }
+}
+
+.mano {
+  touch-action: pan-y;
 }
 
 /* La repisa: la mano de cromos asoma detrás de ella */
@@ -1844,13 +1881,20 @@ button {
 
   .mano__carta {
     --ancho: 58vw;
+    --paso: 19vw;
+    --sube: 10px;
+    --gira: 7deg;
     top: 0;
-    transform: translateX(calc(var(--i) * 19vw)) translateY(calc(var(--i) * var(--i) * 10px)) rotate(calc(var(--i) * 7deg));
   }
 
-  .mano__carta:nth-child(1),
-  .mano__carta:nth-child(5) {
-    display: none;
+  .mano__carta[data-pos='-2'],
+  .mano__carta[data-pos='2'] {
+    visibility: hidden;
+    opacity: 0;
+  }
+
+  .mano__carta {
+    transition: opacity 300ms ease, visibility 300ms;
   }
 
   .cromo__nombre {

@@ -12,6 +12,9 @@ import Icono from '../components/Icono.astro';
 import { negocio, sucursales, semana, evento, horarioAgrupado } from '../data/negocio.js';
 import { buscarItem } from '../data/menu.js';
 import Cancha from '../components/Cancha.astro';
+import fuenteTitulo from '@fontsource-variable/big-shoulders-display/files/big-shoulders-display-latin-wght-normal.woff2?url';
+import fuenteTexto from '@fontsource-variable/archivo/files/archivo-latin-standard-normal.woff2?url';
+import fuenteFirma from '@fontsource/mr-dafoe/files/mr-dafoe-latin-400-normal.woff2?url';
 
 const mano = [
   { id: 'papas-gajo', color: 'mostaza' },
@@ -56,6 +59,9 @@ const jsonLd = {
     <meta property="og:locale" content="es_MX" />
     <meta property="og:image" content={new URL(`${base}img/mesa-960.webp`, Astro.site)} />
     <meta name="robots" content="noindex" />
+    <link rel="preload" href={fuenteTitulo} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={fuenteTexto} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={fuenteFirma} as="font" type="font/woff2" crossorigin />
     <link rel="icon" href={`${base}img/logo-180.webp`} />
     <script is:inline>document.documentElement.classList.add('js');</script>
     <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
@@ -87,8 +93,11 @@ const jsonLd = {
         </h1>
         <div class="mano" data-mano>
           {mano.map((m, i) => (
-            <div class="mano__carta" data-carta style={`--i:${i - 2}`}>
-              <Cromo item={buscarItem(m.id)} color={m.color} nivel="p" principal={m.principal} loading={m.principal ? 'eager' : 'lazy'} sizes="(max-width: 760px) 60vw, 340px" />
+            <div class="mano__carta" data-carta data-pos={i - 2} style={`--i:${i - 2}`}>
+              <div class="mano__pos">
+                <Cromo item={buscarItem(m.id)} color={m.color} nivel="p" principal={m.principal} loading={m.principal ? 'eager' : 'lazy'} sizes="(max-width: 760px) 60vw, 340px" />
+                <button type="button" class="mano__elegir" data-elegir aria-label={`Ver ${buscarItem(m.id).nombre}`}></button>
+              </div>
             </div>
           ))}
         </div>
@@ -250,6 +259,7 @@ const jsonLd = {
     <script>
       import '../scripts/pedido.js';
       import '../scripts/cromos.js';
+      import '../scripts/mano.js';
       import '../scripts/interfaz.js';
       import '../scripts/movimiento.js';
     </script>
