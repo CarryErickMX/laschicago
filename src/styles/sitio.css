@@ -1066,7 +1066,7 @@ button {
 
 .baraja {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 310px));
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 270px), 300px));
   gap: clamp(16px, 2vw, 28px);
   margin-bottom: clamp(20px, 3vw, 36px);
 }

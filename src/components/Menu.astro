@@ -29,7 +29,7 @@ import { categorias } from '../data/menu.js';
       const cromos = c.items.filter((it) => it.cromo);
       const filas = c.items.filter((it) => !it.cromo);
       return (
-        <div class:list={['panel', { 'es-activo': i === 0, 'panel--junto': cromos.length > 0 && filas.length > 0 && filas.length <= 6 }]} id={`panel-${c.id}`} data-panel role="tabpanel" aria-labelledby={`tab-${c.id}`} tabindex="-1">
+        <div class:list={['panel', { 'es-activo': i === 0, 'panel--junto': cromos.length > 0 && cromos.length <= 3 && filas.length > 0 && filas.length <= 6 }]} id={`panel-${c.id}`} data-panel role="tabpanel" aria-labelledby={`tab-${c.id}`} tabindex="-1">
           <h3 class="panel__titulo">{c.titulo}</h3>
           {cromos.length > 0 && (
             <div class="baraja" data-baraja style={`--cantidad:${cromos.length}`}>
